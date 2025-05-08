@@ -11,53 +11,136 @@
       color: #f0f0f0;
       margin: 0;
       padding: 2rem;
+      display: flex;
+      gap: 2rem;
     }
     h1 {
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 1rem;
     }
-    .item-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 1rem;
+    .sidebar {
+      width: 200px;
     }
     .item {
       background: #1f1f2e;
       border-radius: 12px;
       padding: 0.5rem;
       text-align: center;
-      cursor: pointer;
-      transition: transform 0.2s, opacity 0.2s;
-    }
-    .item.checked {
-      opacity: 0.5;
-      text-decoration: line-through;
+      margin-bottom: 1rem;
+      cursor: grab;
     }
     .item img {
       width: 64px;
       height: 64px;
       object-fit: contain;
     }
+    .main {
+      flex-grow: 1;
+    }
+    .dropzone {
+      border: 2px dashed #555;
+      border-radius: 12px;
+      padding: 1rem;
+      min-height: 300px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: #1c1c2b;
+    }
+    .dropped-item {
+      background: #292941;
+      border-radius: 12px;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    .dropped-item img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      background: #ff4d4d;
+      color: white;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <h1>TFT Item Tracker</h1>
-  <div class="item-grid" id="itemGrid">
-    <!-- Example Items -->
-    <div class="item" onclick="toggleItem(this)">
+  <div class="sidebar">
+    <h2>All Items</h2>
+    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="BF Sword" data-src="https://rerollcdn.com/items/BFSword.png">
       <img src="https://rerollcdn.com/items/BFSword.png" alt="BF Sword" />
       <div>BF Sword</div>
     </div>
-    <div class="item" onclick="toggleItem(this)">
+    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Needlessly Large Rod" data-src="https://rerollcdn.com/items/NeedlesslyLargeRod.png">
       <img src="https://rerollcdn.com/items/NeedlesslyLargeRod.png" alt="Needlessly Large Rod" />
       <div>Needlessly Large Rod</div>
     </div>
-    <!-- Add more items here -->
+    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Recurve Bow" data-src="https://rerollcdn.com/items/RecurveBow.png">
+      <img src="https://rerollcdn.com/items/RecurveBow.png" alt="Recurve Bow" />
+      <div>Recurve Bow</div>
+    </div>
+    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Tear of the Goddess" data-src="https://rerollcdn.com/items/TearoftheGoddess.png">
+      <img src="https://rerollcdn.com/items/TearoftheGoddess.png" alt="Tear of the Goddess" />
+      <div>Tear of the Goddess</div>
+    </div>
+    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Giant's Belt" data-src="https://rerollcdn.com/items/GiantsBelt.png">
+      <img src="https://rerollcdn.com/items/GiantsBelt.png" alt="Giant's Belt" />
+      <div>Giant's Belt</div>
+    </div>
+    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Chain Vest" data-src="https://rerollcdn.com/items/ChainVest.png">
+      <img src="https://rerollcdn.com/items/ChainVest.png" alt="Chain Vest" />
+      <div>Chain Vest</div>
+    </div>
+    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Negatron Cloak" data-src="https://rerollcdn.com/items/NegatronCloak.png">
+      <img src="https://rerollcdn.com/items/NegatronCloak.png" alt="Negatron Cloak" />
+      <div>Negatron Cloak</div>
+    </div>
+    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Sparring Gloves" data-src="https://rerollcdn.com/items/SparringGloves.png">
+      <img src="https://rerollcdn.com/items/SparringGloves.png" alt="Sparring Gloves" />
+      <div>Sparring Gloves</div>
+    </div>
+    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Spatula" data-src="https://rerollcdn.com/items/Spatula.png">
+      <img src="https://rerollcdn.com/items/Spatula.png" alt="Spatula" />
+      <div>Spatula</div>
+    </div>
+  </div>
+  <div class="main">
+    <h2>My Comp</h2>
+    <div class="dropzone" id="dropzone" ondragover="allowDrop(event)" ondrop="handleDrop(event)"></div>
+    <button onclick="clearItems()">Clear All</button>
   </div>
 
   <script>
-    function toggleItem(el) {
-      el.classList.toggle("checked");
+    function allowDrop(event) {
+      event.preventDefault();
+    }
+
+    function handleDragStart(event) {
+      const name = event.target.getAttribute("data-name");
+      const src = event.target.getAttribute("data-src");
+      event.dataTransfer.setData("text/plain", JSON.stringify({ name, src }));
+    }
+
+    function handleDrop(event) {
+      event.preventDefault();
+      const data = JSON.parse(event.dataTransfer.getData("text/plain"));
+
+      const newItem = document.createElement("div");
+      newItem.className = "dropped-item";
+      newItem.innerHTML = `
+        <img src="${data.src}" alt="${data.name}" />
+        <div>${data.name}</div>
+      `;
+      document.getElementById("dropzone").appendChild(newItem);
+    }
+
+    function clearItems() {
+      document.getElementById("dropzone").innerHTML = "";
     }
   </script>
 </body>
