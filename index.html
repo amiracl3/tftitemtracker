@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TFT Item Tracker</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #0f0f1a;
+      color: #f0f0f0;
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .item-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 1rem;
+    }
+    .item {
+      background: #1f1f2e;
+      border-radius: 12px;
+      padding: 0.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .item.checked {
+      opacity: 0.5;
+      text-decoration: line-through;
+    }
+    .item img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+  <h1>TFT Item Tracker</h1>
+  <div class="item-grid" id="itemGrid">
+    <!-- Example Items -->
+    <div class="item" onclick="toggleItem(this)">
+      <img src="https://rerollcdn.com/items/BFSword.png" alt="BF Sword" />
+      <div>BF Sword</div>
+    </div>
+    <div class="item" onclick="toggleItem(this)">
+      <img src="https://rerollcdn.com/items/NeedlesslyLargeRod.png" alt="Needlessly Large Rod" />
+      <div>Needlessly Large Rod</div>
+    </div>
+    <!-- Add more items here -->
+  </div>
+
+  <script>
+    function toggleItem(el) {
+      el.classList.toggle("checked");
+    }
+  </script>
+</body>
+</html>
