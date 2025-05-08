@@ -13,20 +13,22 @@
       padding: 2rem;
       display: flex;
       gap: 2rem;
+      flex-direction: row-reverse;
     }
-    h1 {
+    h1, h2 {
       text-align: center;
-      margin-bottom: 1rem;
     }
     .sidebar {
-      width: 200px;
+      width: 240px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
     }
     .item {
       background: #1f1f2e;
       border-radius: 12px;
       padding: 0.5rem;
       text-align: center;
-      margin-bottom: 1rem;
       cursor: grab;
     }
     .item img {
@@ -52,11 +54,29 @@
       border-radius: 12px;
       padding: 0.5rem;
       text-align: center;
+      position: relative;
+      cursor: pointer;
+    }
+    .dropped-item.checked {
+      opacity: 0.4;
     }
     .dropped-item img {
       width: 64px;
       height: 64px;
       object-fit: contain;
+    }
+    .delete-btn {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      cursor: pointer;
     }
     button {
       margin-top: 1rem;
@@ -70,8 +90,14 @@
   </style>
 </head>
 <body>
+  <div class="main">
+    <h2>My Comp</h2>
+    <div class="dropzone" id="dropzone" ondragover="allowDrop(event)" ondrop="handleDrop(event)"></div>
+    <button onclick="clearItems()">Clear All</button>
+  </div>
   <div class="sidebar">
-    <h2>All Items</h2>
+    <h2 style="grid-column: span 2">All Items</h2>
+    <!-- Items Here -->
     <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="BF Sword" data-src="https://rerollcdn.com/items/BFSword.png">
       <img src="https://rerollcdn.com/items/BFSword.png" alt="BF Sword" />
       <div>BF Sword</div>
@@ -109,11 +135,6 @@
       <div>Spatula</div>
     </div>
   </div>
-  <div class="main">
-    <h2>My Comp</h2>
-    <div class="dropzone" id="dropzone" ondragover="allowDrop(event)" ondrop="handleDrop(event)"></div>
-    <button onclick="clearItems()">Clear All</button>
-  </div>
 
   <script>
     function allowDrop(event) {
@@ -133,9 +154,11 @@
       const newItem = document.createElement("div");
       newItem.className = "dropped-item";
       newItem.innerHTML = `
+        <button class="delete-btn" onclick="this.parentElement.remove()">×</button>
         <img src="${data.src}" alt="${data.name}" />
         <div>${data.name}</div>
       `;
+      newItem.onclick = () => newItem.classList.toggle("checked");
       document.getElementById("dropzone").appendChild(newItem);
     }
 
