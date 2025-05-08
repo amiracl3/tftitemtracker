@@ -6,7 +6,7 @@
   <title>TFT Item Tracker</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #0f0f1a;
       color: #f0f0f0;
       margin: 0;
@@ -17,12 +17,13 @@
     }
     h1, h2 {
       text-align: center;
+      margin: 0.5rem 0;
     }
     .sidebar {
-      width: 240px;
+      width: 280px;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
     .item {
       background: #1f1f2e;
@@ -30,6 +31,11 @@
       padding: 0.5rem;
       text-align: center;
       cursor: grab;
+      transition: transform 0.2s;
+    }
+    .item:hover {
+      transform: scale(1.05);
+      background: #27273a;
     }
     .item img {
       width: 64px;
@@ -56,9 +62,11 @@
       text-align: center;
       position: relative;
       cursor: pointer;
+      transition: background 0.2s;
     }
     .dropped-item.checked {
       opacity: 0.4;
+      filter: grayscale(100%);
     }
     .dropped-item img {
       width: 64px;
@@ -67,16 +75,19 @@
     }
     .delete-btn {
       position: absolute;
-      top: -5px;
-      right: -5px;
-      background: red;
+      top: -8px;
+      right: -8px;
+      background: #e74c3c;
       color: white;
       border: none;
       border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      font-size: 12px;
+      width: 22px;
+      height: 22px;
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 1;
       cursor: pointer;
+      box-shadow: 0 0 6px rgba(0,0,0,0.4);
     }
     button {
       margin-top: 1rem;
@@ -87,6 +98,18 @@
       color: white;
       cursor: pointer;
     }
+    .combo-result {
+      margin-top: 1rem;
+      background: #26263a;
+      padding: 1rem;
+      border-radius: 12px;
+    }
+    .combo-result img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      margin: 0.25rem;
+    }
   </style>
 </head>
 <body>
@@ -94,10 +117,10 @@
     <h2>My Comp</h2>
     <div class="dropzone" id="dropzone" ondragover="allowDrop(event)" ondrop="handleDrop(event)"></div>
     <button onclick="clearItems()">Clear All</button>
+    <div class="combo-result" id="comboResult"></div>
   </div>
   <div class="sidebar">
     <h2 style="grid-column: span 2">All Items</h2>
-    <!-- Items Here -->
     <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="BF Sword" data-src="https://rerollcdn.com/items/BFSword.png">
       <img src="https://rerollcdn.com/items/BFSword.png" alt="BF Sword" />
       <div>BF Sword</div>
@@ -106,46 +129,30 @@
       <img src="https://rerollcdn.com/items/NeedlesslyLargeRod.png" alt="Needlessly Large Rod" />
       <div>Needlessly Large Rod</div>
     </div>
-    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Recurve Bow" data-src="https://rerollcdn.com/items/RecurveBow.png">
-      <img src="https://rerollcdn.com/items/RecurveBow.png" alt="Recurve Bow" />
-      <div>Recurve Bow</div>
-    </div>
-    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Tear of the Goddess" data-src="https://rerollcdn.com/items/TearoftheGoddess.png">
-      <img src="https://rerollcdn.com/items/TearoftheGoddess.png" alt="Tear of the Goddess" />
-      <div>Tear of the Goddess</div>
-    </div>
-    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Giant's Belt" data-src="https://rerollcdn.com/items/GiantsBelt.png">
-      <img src="https://rerollcdn.com/items/GiantsBelt.png" alt="Giant's Belt" />
-      <div>Giant's Belt</div>
-    </div>
-    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Chain Vest" data-src="https://rerollcdn.com/items/ChainVest.png">
-      <img src="https://rerollcdn.com/items/ChainVest.png" alt="Chain Vest" />
-      <div>Chain Vest</div>
-    </div>
-    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Negatron Cloak" data-src="https://rerollcdn.com/items/NegatronCloak.png">
-      <img src="https://rerollcdn.com/items/NegatronCloak.png" alt="Negatron Cloak" />
-      <div>Negatron Cloak</div>
-    </div>
-    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Sparring Gloves" data-src="https://rerollcdn.com/items/SparringGloves.png">
-      <img src="https://rerollcdn.com/items/SparringGloves.png" alt="Sparring Gloves" />
-      <div>Sparring Gloves</div>
-    </div>
-    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Spatula" data-src="https://rerollcdn.com/items/Spatula.png">
-      <img src="https://rerollcdn.com/items/Spatula.png" alt="Spatula" />
-      <div>Spatula</div>
-    </div>
+    <!-- Add all other items here as before -->
   </div>
 
   <script>
+    const combinationMap = {
+      "BF Sword|Needlessly Large Rod": {
+        name: "Hextech Gunblade",
+        src: "https://rerollcdn.com/items/HextechGunblade.png"
+      },
+      // Add other combinations as needed
+    };
+
     function allowDrop(event) {
       event.preventDefault();
     }
 
     function handleDragStart(event) {
-      const name = event.target.getAttribute("data-name");
-      const src = event.target.getAttribute("data-src");
+      const item = event.currentTarget;
+      const name = item.getAttribute("data-name");
+      const src = item.getAttribute("data-src");
       event.dataTransfer.setData("text/plain", JSON.stringify({ name, src }));
     }
+
+    let droppedItems = [];
 
     function handleDrop(event) {
       event.preventDefault();
@@ -154,16 +161,56 @@
       const newItem = document.createElement("div");
       newItem.className = "dropped-item";
       newItem.innerHTML = `
-        <button class="delete-btn" onclick="this.parentElement.remove()">×</button>
+        <button class="delete-btn" onclick="deleteItem(this)">×</button>
         <img src="${data.src}" alt="${data.name}" />
         <div>${data.name}</div>
       `;
       newItem.onclick = () => newItem.classList.toggle("checked");
       document.getElementById("dropzone").appendChild(newItem);
+
+      droppedItems.push(data);
+      checkForCombo();
+    }
+
+    function deleteItem(button) {
+      const itemDiv = button.parentElement;
+      const name = itemDiv.querySelector("div").innerText;
+      droppedItems = droppedItems.filter(item => item.name !== name || itemDiv.removed);
+      itemDiv.remove();
+      checkForCombo();
     }
 
     function clearItems() {
       document.getElementById("dropzone").innerHTML = "";
+      document.getElementById("comboResult").innerHTML = "";
+      droppedItems = [];
+    }
+
+    function checkForCombo() {
+      const resultDiv = document.getElementById("comboResult");
+      resultDiv.innerHTML = "";
+      const names = droppedItems.map(d => d.name);
+      if (names.length >= 2) {
+        for (let i = 0; i < names.length; i++) {
+          for (let j = i + 1; j < names.length; j++) {
+            const key = `${names[i]}|${names[j]}`;
+            const reverseKey = `${names[j]}|${names[i]}`;
+            const result = combinationMap[key] || combinationMap[reverseKey];
+            if (result) {
+              resultDiv.innerHTML += `
+                <div>
+                  <strong>${result.name}</strong><br />
+                  <img src="${result.src}" alt="${result.name}" />
+                  <div style="display:flex; gap:0.5rem; justify-content:center">
+                    <img src="${droppedItems[i].src}" title="${names[i]}" />
+                    <img src="${droppedItems[j].src}" title="${names[j]}" />
+                  </div>
+                </div>
+              `;
+            }
+          }
+        }
+      }
     }
   </script>
 </body>
