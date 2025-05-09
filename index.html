@@ -13,7 +13,7 @@
       padding: 2rem;
       display: flex;
       gap: 2rem;
-      flex-direction: row-reverse;
+      flex-direction: row;
     }
     h1, h2 {
       text-align: center;
@@ -81,11 +81,13 @@
       color: white;
       border: none;
       border-radius: 50%;
-      width: 22px;
-      height: 22px;
-      font-size: 14px;
+      width: 24px;
+      height: 24px;
+      font-size: 16px;
       font-weight: bold;
-      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
       box-shadow: 0 0 6px rgba(0,0,0,0.4);
     }
@@ -110,6 +112,12 @@
       object-fit: contain;
       margin: 0.25rem;
     }
+    .combo-entry {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      gap: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -129,7 +137,7 @@
       <img src="https://rerollcdn.com/items/NeedlesslyLargeRod.png" alt="Needlessly Large Rod" />
       <div>Needlessly Large Rod</div>
     </div>
-    <!-- Add all other items here as before -->
+    <!-- Add more components here -->
   </div>
 
   <script>
@@ -138,7 +146,7 @@
         name: "Hextech Gunblade",
         src: "https://rerollcdn.com/items/HextechGunblade.png"
       },
-      // Add other combinations as needed
+      // Add more combinations here
     };
 
     function allowDrop(event) {
@@ -175,7 +183,8 @@
     function deleteItem(button) {
       const itemDiv = button.parentElement;
       const name = itemDiv.querySelector("div").innerText;
-      droppedItems = droppedItems.filter(item => item.name !== name || itemDiv.removed);
+      const index = droppedItems.findIndex(item => item.name === name);
+      if (index !== -1) droppedItems.splice(index, 1);
       itemDiv.remove();
       checkForCombo();
     }
@@ -189,25 +198,29 @@
     function checkForCombo() {
       const resultDiv = document.getElementById("comboResult");
       resultDiv.innerHTML = "";
-      const names = droppedItems.map(d => d.name);
-      if (names.length >= 2) {
-        for (let i = 0; i < names.length; i++) {
-          for (let j = i + 1; j < names.length; j++) {
-            const key = `${names[i]}|${names[j]}`;
-            const reverseKey = `${names[j]}|${names[i]}`;
-            const result = combinationMap[key] || combinationMap[reverseKey];
-            if (result) {
-              resultDiv.innerHTML += `
+      const seen = new Set();
+      for (let i = 0; i < droppedItems.length; i++) {
+        for (let j = i + 1; j < droppedItems.length; j++) {
+          const name1 = droppedItems[i].name;
+          const name2 = droppedItems[j].name;
+          const key = `${name1}|${name2}`;
+          const reverseKey = `${name2}|${name1}`;
+          const combo = combinationMap[key] || combinationMap[reverseKey];
+          const id = `${name1}-${name2}`;
+          if (combo && !seen.has(id) && !seen.has(`${name2}-${name1}`)) {
+            seen.add(id);
+            resultDiv.innerHTML += `
+              <div class="combo-entry">
+                <img src="${combo.src}" alt="${combo.name}" title="${combo.name}" />
                 <div>
-                  <strong>${result.name}</strong><br />
-                  <img src="${result.src}" alt="${result.name}" />
-                  <div style="display:flex; gap:0.5rem; justify-content:center">
-                    <img src="${droppedItems[i].src}" title="${names[i]}" />
-                    <img src="${droppedItems[j].src}" title="${names[j]}" />
+                  <div><strong>${combo.name}</strong></div>
+                  <div style="display:flex; gap:0.5rem;">
+                    <img src="${droppedItems[i].src}" title="${name1}" />
+                    <img src="${droppedItems[j].src}" title="${name2}" />
                   </div>
                 </div>
-              `;
-            }
+              </div>
+            `;
           }
         }
       }
