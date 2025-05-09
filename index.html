@@ -106,11 +106,6 @@
       padding: 1rem;
       border-radius: 12px;
     }
-    .combo-result hr {
-      border: none;
-      border-top: 1px solid #555;
-      margin: 0.5rem 0;
-    }
     .combo-result img {
       width: 48px;
       height: 48px;
@@ -134,35 +129,37 @@
   </div>
   <div class="sidebar">
     <h2 style="grid-column: span 2">All Items</h2>
+    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="BF Sword" data-src="https://rerollcdn.com/items/BFSword.png">
+      <img src="https://rerollcdn.com/items/BFSword.png" alt="BF Sword" />
+      <div>BF Sword</div>
+    </div>
+    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Needlessly Large Rod" data-src="https://rerollcdn.com/items/NeedlesslyLargeRod.png">
+      <img src="https://rerollcdn.com/items/NeedlesslyLargeRod.png" alt="Needlessly Large Rod" />
+      <div>Needlessly Large Rod</div>
+    </div>
+    <div class="item" draggable="true" ondragstart="handleDragStart(event)" data-name="Sparring Gloves" data-src="https://rerollcdn.com/items/SparringGloves.png">
+      <img src="https://rerollcdn.com/items/SparringGloves.png" alt="Sparring Gloves" />
+      <div>Sparring Gloves</div>
+    </div>
+    <!-- Add more components here -->
   </div>
+
   <script>
-    const components = [
-      { name: "BF Sword", src: "https://rerollcdn.com/items/BFSword.png" },
-      { name: "Needlessly Large Rod", src: "https://rerollcdn.com/items/NeedlesslyLargeRod.png" },
-      { name: "Tear of the Goddess", src: "https://rerollcdn.com/items/TearoftheGoddess.png" },
-      { name: "Chain Vest", src: "https://rerollcdn.com/items/ChainVest.png" },
-      { name: "Negatron Cloak", src: "https://rerollcdn.com/items/NegatronCloak.png" },
-      { name: "Giant's Belt", src: "https://rerollcdn.com/items/GiantsBelt.png" },
-      { name: "Recurve Bow", src: "https://rerollcdn.com/items/RecurveBow.png" },
-      { name: "Sparring Gloves", src: "https://rerollcdn.com/items/SparringGloves.png" }
-    ];
-
     const combinationMap = {
-      "BF Sword|Sparring Gloves": { name: "Infinity Edge", src: "https://rerollcdn.com/items/InfinityEdge.png" },
-      "BF Sword|Needlessly Large Rod": { name: "Hextech Gunblade", src: "https://rerollcdn.com/items/HextechGunblade.png" },
-      // Add more combinations here as needed
+      "BF Sword|Needlessly Large Rod": {
+        name: "Hextech Gunblade",
+        src: "https://rerollcdn.com/items/HextechGunblade.png"
+      },
+      "BF Sword|Sparring Gloves": {
+        name: "Infinity Edge",
+        src: "https://rerollcdn.com/items/InfinityEdge.png"
+      },
+      "Needlessly Large Rod|Sparring Gloves": {
+        name: "Rabadon's Deathcap",
+        src: "https://rerollcdn.com/items/RabadonsDeathcap.png"
+      },
+      // Add more combinations here
     };
-
-    components.forEach(comp => {
-      const el = document.createElement("div");
-      el.className = "item";
-      el.draggable = true;
-      el.ondragstart = handleDragStart;
-      el.setAttribute("data-name", comp.name);
-      el.setAttribute("data-src", comp.src);
-      el.innerHTML = `<img src="${comp.src}" alt="${comp.name}" /><div>${comp.name}</div>`;
-      document.querySelector(".sidebar").appendChild(el);
-    });
 
     function allowDrop(event) {
       event.preventDefault();
@@ -235,7 +232,6 @@
                   </div>
                 </div>
               </div>
-              <hr />
             `;
           }
         }
